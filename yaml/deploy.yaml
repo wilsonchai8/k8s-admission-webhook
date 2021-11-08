@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wilsonchai-webhook-deployment
+  labels:
+    app: wilsonchai-webhook
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wilsonchai-webhook
+  template:
+    metadata:
+      labels:
+        app: wilsonchai-webhook
+    spec:
+      serviceAccount: wilsonchai-webhook-sa
+      containers:
+        - name: wilsonchai-webhook
+          image: registry.cn-beijing.aliyuncs.com/wilsonchai/mutating-webhook:0.0.1
+          imagePullPolicy: Always
+          args:
+            - -tlsCertFile=/etc/webhook/certs/cert.pem
+            - -tlsKeyFile=/etc/webhook/certs/key.pem
+            - -alsologtostderr
+            - -v=4
+            - 2>&1
+          volumeMounts:
+            - name: webhook-certs
+              mountPath: /etc/webhook/certs
+              readOnly: true
+      volumes:
+        - name: webhook-certs
+          secret:
+            secretName: wilsonchai-webhook-certs
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: wilsonchai-webhook-svc
+  labels:
+    app: wilsonchai-webhook
+spec:
+  ports:
+  - port: 443
+    targetPort: 443
+  selector:
+    app: wilsonchai-webhook
+

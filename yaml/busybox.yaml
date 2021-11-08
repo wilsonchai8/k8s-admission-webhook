@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: busybox-test
+spec:
+  selector:
+    matchLabels:
+      app: busybox-test
+  template:
+    metadata:
+      labels:
+        app: busybox-test
+    spec:
+      containers:
+      - name: busybox-test
+        image: busybox
+        command: ["/bin/sleep","infinity"]
+        imagePullPolicy: IfNotPresent

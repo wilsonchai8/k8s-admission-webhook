@@ -1,0 +1,23 @@
+apiVersion: admissionregistration.k8s.io/v1beta1
+kind: MutatingWebhookConfiguration
+metadata:
+  name: wilsonchai-webhook-example-cfg
+  labels:
+    app: wilsonchai-webhook
+webhooks:
+  - name: mutate.wilsonchai.io
+    clientConfig:
+      service:
+        name: wilsonchai-webhook-svc
+        namespace: default
+        path: "/mutate"
+      caBundle: ${CA_BUNDLE}
+    rules:
+      - operations: [ "CREATE" ]
+        apiGroups: ["apps", ""]
+        apiVersions: ["v1"]
+        resources: ["deployments","services"]
+    namespaceSelector:
+      matchLabels:
+        wilsonchai-webhook: enabled
+
